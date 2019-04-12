@@ -5,7 +5,8 @@
   "author": "Samer Buna",
   "license": "ISC",
   "scripts": {
-    "start": "node lib/index"
+    "start": "node lib/index",
+    "dev": "nodemon lib/index"
   },
   "repository": {
     "type": "git",
