@@ -1,0 +1,19 @@
+version: "3"
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - postgresql
+  mongodb:
+    image: "mongo:3.4.20-xenial"
+  postgresql:
+    image: "postgres:11.2-alpine"
+    environment:
+      - POSTGRES_PASSWORD=supersecret
+      - POSTGRES_USER=babanu
+      - POSTGRES_DB=testdb
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data

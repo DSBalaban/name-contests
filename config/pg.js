@@ -1,5 +1,9 @@
 module.exports = {
   development: {
-    database: 'contests'
+    host: "postgresql",
+    port: 5432,
+    user: "babanu",
+    password: "supersecret",
+    database: "contests"
   }
 };
