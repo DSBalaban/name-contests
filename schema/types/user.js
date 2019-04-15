@@ -7,13 +7,12 @@ const {
   GraphQLList
 } = require("graphql");
 
-const pgdb = require("../../database/pgdb");
 const mdb = require("../../database/mdb");
 
 const ContestType = require("./contest");
 
 module.exports = new GraphQLObjectType({
-  name: "MeType",
+  name: "UserType",
   fields: {
     id: { type: GraphQLID },
     email: { type: new GraphQLNonNull(GraphQLString) },
@@ -22,27 +21,25 @@ module.exports = new GraphQLObjectType({
     createdAt: { type: GraphQLString },
     contests: {
       type: new GraphQLList(ContestType),
-      resolve: (obj, args, { pgPool }) => {
-        return pgdb(pgPool).getContests(obj);
+      resolve: (obj, args, { loaders }) => {
+        // return pgdb(pgPool).getContests(obj);
+        return loaders.contestsForUserIds.load(obj.id);
       }
     },
     contestsCount: {
       type: GraphQLInt,
-      resolve: (obj, args, { mPool }, { fieldName }) => {
-        return mdb(mPool).getCounts(obj, fieldName);
-      }
+      resolve: (obj, args, { loaders }, { fieldName }) =>
+        loaders.mdb.usersByIds.load(obj.id).then(res => res[fieldName])
     },
     namesCount: {
       type: GraphQLInt,
-      resolve: (obj, args, { mPool }, { fieldName }) => {
-        return mdb(mPool).getCounts(obj, fieldName);
-      }
+      resolve: (obj, args, { loaders }, { fieldName }) =>
+        loaders.mdb.usersByIds.load(obj.id).then(res => res[fieldName])
     },
     votesCount: {
       type: GraphQLInt,
-      resolve: (obj, args, { mPool }, { fieldName }) => {
-        return mdb(mPool).getCounts(obj, fieldName);
-      }
+      resolve: (obj, args, { loaders }, { fieldName }) =>
+        loaders.mdb.usersByIds.load(obj.id).then(res => res[fieldName])
     }
   }
 });

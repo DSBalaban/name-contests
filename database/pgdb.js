@@ -1,14 +1,24 @@
-const { camelizeObj, camelizeArrayOfObj } = require("../lib/util");
+const { orderedFor } = require("../lib/util");
 
 module.exports = pgPool => ({
-  getUser(apiKey) {
+  getUsersByApiKeys(apiKeys) {
     return pgPool
-      .query("select * from users where api_key = $1", [apiKey])
-      .then(res => camelizeObj(res.rows[0]));
+      .query("select * from users where api_key = ANY($1)", [apiKeys])
+      .then(res => orderedFor(res.rows, apiKeys, "apiKey", true));
   },
-  getContests(user) {
+  getUsersByIds(userIds) {
     return pgPool
-      .query("select * from contests where created_by = $1", [user.id])
-      .then(res => camelizeArrayOfObj(res.rows));
+      .query("select * from users where id = ANY($1)", [userIds])
+      .then(res => orderedFor(res.rows, userIds, "id", true));
+  },
+  getContestsForUserIds(userIds) {
+    return pgPool
+      .query("select * from contests where created_by = ANY($1)", [userIds])
+      .then(res => orderedFor(res.rows, userIds, "createdBy", false));
+  },
+  getNamesForContestIds(contestIds) {
+    return pgPool
+      .query("select * from names where contest_id = ANY($1)", [contestIds])
+      .then(res => orderedFor(res.rows, contestIds, "contestId", false));
   }
 });

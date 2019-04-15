@@ -6,8 +6,7 @@ const {
   GraphQLNonNull
 } = require("graphql");
 
-const pgdb = require("../database/pgdb");
-const MeType = require("./types/me");
+const UserType = require("./types/user");
 
 // The root query type is where in the data graph
 // we can start asking questions
@@ -15,17 +14,21 @@ const RootQueryType = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
     me: {
-      type: MeType,
+      type: UserType,
       description: "The current user identified by an api key",
       args: {
         key: { type: new GraphQLNonNull(GraphQLString) }
       },
       // 3rd arg is the value passed in lib/index.js context prop for express-graphql middleware
-      resolve: (obj, args, { pgPool }) => {
+      resolve: (obj, args, { loaders }) => {
         // connect to pg
         // use args.key as the api key
         // pgPool
-        return pgdb(pgPool).getUser(args.key);
+        // return pgdb(pgPool).getUserByApiKey(args.key);
+
+        // Nevermind that
+        // Dataloaders woo
+        return loaders.usersByApiKeys.load(args.key);
       }
     }
   }
